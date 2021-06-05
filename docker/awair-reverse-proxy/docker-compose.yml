@@ -1,0 +1,36 @@
+version: "3.7"
+
+x-service: &default-service
+    logging:
+        driver: json-file
+        options:
+            max-size: "10m"
+            max-file: "5"
+    init: true
+
+x-environment: &default-environment
+    TZ: Asia/Tokyo
+
+x-network-host: &custom-network-host
+    network_mode: "host"
+
+services:
+    nginx:
+        <<: *default-service
+        <<: *custom-network-host
+        container_name: nginx-proxy
+        image: nginx:latest
+        ports:
+            - "8905:8905"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        environment:
+            <<: *default-environment
+        restart: unless-stopped
+
+
+networks:
+    default:
+        external:
+            name: bridge

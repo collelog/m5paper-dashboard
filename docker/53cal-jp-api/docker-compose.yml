@@ -1,0 +1,36 @@
+version: "3.7"
+
+x-service: &default-service
+    logging:
+        driver: json-file
+        options:
+            max-size: "10m"
+            max-file: "5"
+    init: true
+
+x-environment: &default-environment
+    TZ: Asia/Tokyo
+
+x-network-host: &custom-network-host
+    network_mode: "host"
+
+services:
+    53cal-jp-api:
+        <<: *default-service
+        <<: *custom-network-host
+        container_name: 53cal-jp-api
+        image: collelog/53cal-jp-api
+        ports:
+            - "8901:8901"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./:/root/.npm/_logs/
+        environment:
+            <<: *default-environment
+        restart: unless-stopped
+
+
+networks:
+    default:
+        external:
+            name: bridge
